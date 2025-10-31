@@ -35,33 +35,47 @@ func (k personKind) String() string {
 	}
 }
 
-type model struct {
+type counterModel struct {
 	elemStudentCount int
 	hsBoyCount       int
 	hsGirlCount      int
 	parentCount      int
 	otherCount       int
 
+	showSaveDialog bool
+
 	history history
 	message string
 }
 
-func (m model) Init() tea.Cmd {
+func (m counterModel) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m counterModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if m.showSaveDialog {
+		switch msg := msg.(type) {
+		case tea.KeyMsg:
+			switch msg.String() {
+			case "y":
+				msg, err := m.history.Save()
+				if err != nil {
+					log.Fatal(err)
+				}
+				m.message = msg
+				return m, tea.Quit
+			case "n":
+				return m, tea.Quit
+			case "esc":
+				return m, nil
+			}
+		}
+	}
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "ctrl+c":
-			msg, err := m.history.Save()
-			if err != nil {
-				log.Fatal(err)
-			}
-			m.message = msg
-			fmt.Println(msg)
-			return m, tea.Quit
+			m.showSaveDialog = true
 		case "backspace":
 			last := m.history.Pop()
 			switch last.kind {
@@ -110,17 +124,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) View() string {
+func (m counterModel) View() string {
 	table := fmt.Sprintf(
 		"小学生: %d\n中高生男子: %d\n中高生女子: %d\n親: %d\nその他: %d\n\n",
 		m.elemStudentCount, m.hsBoyCount, m.hsGirlCount, m.parentCount, m.otherCount,
 	)
-	usage := "[g] 小学生+1, [h] 中高生男子+1, [j] 中高生女子, [k] 親, [l] その他, [q] quit\n"
+	usage := "[g] 小学生, [h] 中高生男子, [j] 中高生女子, [k] 親, [l] その他, [q] quit\n"
 	return table + usage + m.message
 }
 
 func main() {
-	p := tea.NewProgram(model{})
+	p := tea.NewProgram(counterModel{})
 	if _, err := p.Run(); err != nil {
 		fmt.Println("Error:", err)
 	}
