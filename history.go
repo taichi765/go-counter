@@ -62,6 +62,7 @@ func (h *history) Save() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("[save] failed to create file: %w", err)
 	}
+	defer f.Close()
 	w := bufio.NewWriter(f)
 
 	_, err = w.Write(oldText)
@@ -92,6 +93,7 @@ func readOldText(path string) ([]byte, error) {
 	} else if err != nil {
 		return nil, fmt.Errorf("[readOldText] failed to open file: %w", err)
 	}
+	defer f.Close()
 
 	oldText, err := io.ReadAll(f)
 	if err != nil {

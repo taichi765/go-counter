@@ -125,12 +125,16 @@ func (m counterModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m counterModel) View() string {
-	table := fmt.Sprintf(
-		"小学生: %d\n中高生男子: %d\n中高生女子: %d\n親: %d\nその他: %d\n\n",
-		m.elemStudentCount, m.hsBoyCount, m.hsGirlCount, m.parentCount, m.otherCount,
-	)
-	usage := "[g] 小学生, [h] 中高生男子, [j] 中高生女子, [k] 親, [l] その他, [q] quit\n"
-	return table + usage + m.message
+	if m.showSaveDialog {
+		return "セーブしますか？(Y/n/esc)"
+	} else {
+		table := fmt.Sprintf(
+			"小学生: %d\n中高生男子: %d\n中高生女子: %d\n親: %d\nその他: %d\n\n",
+			m.elemStudentCount, m.hsBoyCount, m.hsGirlCount, m.parentCount, m.otherCount,
+		)
+		usage := "[g] 小学生, [h] 中高生男子, [j] 中高生女子, [k] 親, [l] その他, [q] quit\n"
+		return table + usage + m.message
+	}
 }
 
 func main() {
