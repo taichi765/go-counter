@@ -67,6 +67,7 @@ func (m counterModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "n":
 				return m, tea.Quit
 			case "esc":
+				m.showSaveDialog = false
 				return m, nil
 			}
 		}

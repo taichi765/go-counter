@@ -78,6 +78,8 @@ func (h *history) Save() (string, error) {
 		}
 	}
 
+	h.Clear()
+
 	err = w.Flush()
 	if err != nil {
 		return "", fmt.Errorf("[save] failed to flush buffer: %w", err)
