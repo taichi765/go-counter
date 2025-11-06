@@ -10,7 +10,10 @@ def drop_duplicates():
 
 
 def show_graph():
-    df = pd.read_csv("modified_251031.csv")
+    df = pd.read_csv("modified_251031.csv", header=None, names=["time", "kind"])
+    df["time"] = df["time"].map(lambda s: s.split(" +0900")[0])
+    df["time"] = pd.to_datetime(df["time"], format="%Y-%m-%d %H:%M:%S.%f")
+    df.set_index("time", inplace=True)
     df_grouped = (
         df.groupby([pd.Grouper(key="time", freq="30 min"), "kind"])
         .size()
@@ -23,7 +26,7 @@ def show_graph():
         figsize=(10, 5),
     )
     plt.title("Count of 'kind' every 10 minutes")
-    plt.xlabel("Time (10min bins)")
+    plt.xlabel("Time")
     plt.ylabel("Count")
     plt.xticks(rotation=45)
     plt.tight_layout()

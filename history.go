@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"time"
 )
@@ -106,9 +105,9 @@ func readOldText(path string) ([]byte, error) {
 }
 
 func getFileName() string {
-	now := time.Now().Local().Day()
+	now := time.Now().Local()
 
-	switch now {
+	switch now.Day() {
 	case 30:
 		return "log_test_251030.csv"
 	case 31:
@@ -118,7 +117,7 @@ func getFileName() string {
 	case 2:
 		return "log_251102.csv"
 	default:
-		log.Fatal("文化祭は終了しました")
-		return ""
+		fmt.Println("warning: 2025年度文化祭は終了しています")
+		return fmt.Sprintf("log_%v%v%v.csv", now.Year(), now.Month(), now.Day())
 	}
 }
