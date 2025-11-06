@@ -106,18 +106,5 @@ func readOldText(path string) ([]byte, error) {
 
 func getFileName() string {
 	now := time.Now().Local()
-
-	switch now.Day() {
-	case 30:
-		return "log_test_251030.csv"
-	case 31:
-		return "log_251031.csv"
-	case 1:
-		return "log_251101.csv"
-	case 2:
-		return "log_251102.csv"
-	default:
-		fmt.Println("warning: 2025年度文化祭は終了しています")
-		return fmt.Sprintf("log_%v%v%v.csv", now.Year(), now.Month(), now.Day())
-	}
+	return fmt.Sprintf("logs/log_%v%v%v.csv", now.Year(), now.Month(), now.Day())
 }

@@ -3,13 +3,6 @@ import matplotlib.pyplot as plt
 import japanize_matplotlib
 
 
-def drop_duplicates():
-    df = pd.read_csv("../copy_251031.csv", header=None, names=["time", "kind"])
-    df = df.drop_duplicates()
-
-    df.to_csv("modified_251031.csv", index=False)
-
-
 def init_figure(file_path: str, graph_title: str):
     df = pd.read_csv(file_path, header=None, names=["time", "kind"])
     df["time"] = df["time"].map(lambda s: s.split(" +0900")[0])
@@ -29,7 +22,7 @@ def init_figure(file_path: str, graph_title: str):
     ax.set_ylabel("Count")
 
 
-init_figure("modified_251031.csv", "30分ごとの種類別来場者数 10/31")
-init_figure("../log_251101.csv", "30分ごとの種類別来場者数 11/1")
-init_figure("../log_251102.csv", "30分ごとの種類別来場者数 11/2")
+init_figure("../logs/log_251031.csv", "30分ごとの種類別来場者数 10/31")
+init_figure("../logs/log_251101.csv", "30分ごとの種類別来場者数 11/1")
+init_figure("../logs/log_251102.csv", "30分ごとの種類別来場者数 11/2")
 plt.show()
