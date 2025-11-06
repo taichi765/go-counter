@@ -8,13 +8,21 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// TODO: ドキュメントコメントを残す
+
+// 種別を表すenum(的なもの)
 type personKind int
 
 const (
+	//小学生
 	elemStudent personKind = iota
+	//高校生男子
 	hsBoy
+	//高校生女子
 	hsGirl
+	//親
 	parent
+	//その他
 	other
 )
 
@@ -52,13 +60,14 @@ func (m counterModel) Init() tea.Cmd {
 	return nil
 }
 
+// TODO: 長いのでわける
 func (m counterModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.showSaveDialog {
 		switch msg := msg.(type) {
 		case tea.KeyMsg:
 			switch msg.String() {
 			case "y":
-				msg, err := m.history.Save()
+				msg, err := m.history.save() // TODO: Cmdで返す
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -78,7 +87,7 @@ func (m counterModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "q", "ctrl+c":
 			m.showSaveDialog = true
 		case "backspace":
-			last := m.history.Pop()
+			last := m.history.pop()
 			switch last.kind {
 
 			case elemStudent:
@@ -95,30 +104,30 @@ func (m counterModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				log.Fatal("[Update] unknown kind")
 			}
 		case "ctrl+s":
-			msg, err := m.history.Save()
+			msg, err := m.history.save()
 			if err != nil {
 				log.Fatal(err)
 			}
 			m.message = msg
 		case "g":
 			m.elemStudentCount++
-			m.history.Add(historyEntry{time: time.Now(), kind: elemStudent})
+			m.history.add(historyEntry{time: time.Now(), kind: elemStudent})
 			m.message = ""
 		case "h":
 			m.hsBoyCount++
-			m.history.Add(historyEntry{time: time.Now(), kind: hsBoy})
+			m.history.add(historyEntry{time: time.Now(), kind: hsBoy})
 			m.message = ""
 		case "j":
 			m.hsGirlCount++
-			m.history.Add(historyEntry{time: time.Now(), kind: hsGirl})
+			m.history.add(historyEntry{time: time.Now(), kind: hsGirl})
 			m.message = ""
 		case "k":
 			m.parentCount++
-			m.history.Add(historyEntry{time: time.Now(), kind: parent})
+			m.history.add(historyEntry{time: time.Now(), kind: parent})
 			m.message = ""
 		case "l":
 			m.otherCount++
-			m.history.Add(historyEntry{time: time.Now(), kind: other})
+			m.history.add(historyEntry{time: time.Now(), kind: other})
 			m.message = ""
 		}
 	}

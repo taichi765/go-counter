@@ -16,41 +16,24 @@ type historyEntry struct {
 
 type history struct {
 	entries []historyEntry
-	index   int // 現在の参照位置
 }
 
-func (h *history) Add(e historyEntry) {
+func (h *history) add(e historyEntry) {
 	h.entries = append(h.entries, e)
-	h.index = len(h.entries) // 最新に移動
 }
 
-func (h *history) Prev() *historyEntry {
-	if h.index > 0 {
-		h.index--
-	}
-	return &h.entries[h.index]
-}
-
-func (h *history) Next() *historyEntry {
-	if h.index < len(h.entries)-1 {
-		h.index++
-		return &h.entries[h.index]
-	}
-	h.index = len(h.entries) // 最後に戻る
-	return nil
-}
-func (h *history) Clear() {
+func (h *history) clear() {
 	h.entries = []historyEntry{}
-	h.index = 0
 }
 
-func (h *history) Pop() historyEntry {
+// 一番後ろのhistoryEntryを取り出して返す
+func (h *history) pop() historyEntry {
 	last := h.entries[len(h.entries)-1]
 	h.entries = h.entries[:len(h.entries)-1]
 	return last
 }
 
-func (h *history) Save() (string, error) {
+func (h *history) save() (string, error) {
 	fileName := getFileName()
 	oldText, err := readOldText(fileName)
 	if err != nil {
@@ -77,7 +60,7 @@ func (h *history) Save() (string, error) {
 		}
 	}
 
-	h.Clear()
+	h.clear()
 
 	err = w.Flush()
 	if err != nil {
