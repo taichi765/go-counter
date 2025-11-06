@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import japanize_matplotlib
 
 
 def drop_duplicates():
@@ -9,28 +10,26 @@ def drop_duplicates():
     df.to_csv("modified_251031.csv", index=False)
 
 
-def show_graph():
-    df = pd.read_csv("modified_251031.csv", header=None, names=["time", "kind"])
+def init_figure(file_path: str, graph_title: str):
+    df = pd.read_csv(file_path, header=None, names=["time", "kind"])
     df["time"] = df["time"].map(lambda s: s.split(" +0900")[0])
     df["time"] = pd.to_datetime(df["time"], format="%Y-%m-%d %H:%M:%S.%f")
     df.set_index("time", inplace=True)
     df_grouped = (
-        df.groupby([pd.Grouper(key="time", freq="30 min"), "kind"])
-        .size()
-        .unstack(fill_value=0)
+        df.groupby([pd.Grouper(freq="30 min"), "kind"]).size().unstack(fill_value=0)
     )
-    df_grouped.plot(
+    ax = df_grouped.plot(
         kind="bar",
         stacked=True,
-        colormap="tab10",  # 色の指定（例："tab10", "Set2", "Paired" など）
+        colormap="tab10",
         figsize=(10, 5),
     )
-    plt.title("Count of 'kind' every 10 minutes")
-    plt.xlabel("Time")
-    plt.ylabel("Count")
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
+    ax.set_title(graph_title)
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Count")
 
 
-show_graph()
+init_figure("modified_251031.csv", "30分ごとの種類別来場者数 10/31")
+init_figure("../log_251101.csv", "30分ごとの種類別来場者数 11/1")
+init_figure("../log_251102.csv", "30分ごとの種類別来場者数 11/2")
+plt.show()
