@@ -47,7 +47,7 @@ jobs:
         with:
           name: binaries
       - name: List artifacts
-        run: pwd&&ls
+        run: ls
 
       - name: Upload to Github Releases
         if: github.ref_type == 'tag'
