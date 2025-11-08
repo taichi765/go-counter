@@ -1,7 +1,8 @@
-- 種類を変えたいとかデータ分析したいとかあったら好きに編集して勝手にpushして大丈夫です。
-- 右側のReleaseのところから実行ファイルをダウンロードできます。
+- 種類を変えたいとかデータ分析したいとかあったら好きに編集して勝手に push して大丈夫です。
+- 種類を変えたい場合は、// KIND と書かれているところすべてを変更してください。
+- 右側の Release のところから実行ファイルをダウンロードできます。
 - ログファイルは`logs/`のなかに日付ごとに入っています。
-- `python/main.py`を実行すると↓みたいな感じのグラフが出てきます。
+- `python/main.py`を実行すると ↓ みたいな感じのグラフが出てきます。
 <details>
   <summary>棒グラフ</summary>
   <img width="1366" height="669" alt="bunkasai_day1" src="https://github.com/user-attachments/assets/95db00ae-99a9-45d5-86ff-1fb275e0d799" />
