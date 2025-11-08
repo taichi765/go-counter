@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -33,41 +34,70 @@ func (h *history) pop() historyEntry {
 	return last
 }
 
-func (h *history) save() (string, error) {
-	fileName := getFileName()
-	oldText, err := readOldText(fileName)
-	if err != nil {
-		return "", fmt.Errorf("[save] failed to read existing text: %w ", err)
+type writerWithFile struct {
+	w *bufio.Writer
+	f *os.File
+}
+
+func (h *history) save() error {
+	writers := make(map[string]*writerWithFile)
+
+	for _, v := range h.entries {
+		path := getFilePath(v.time)
+		var wtr *writerWithFile
+		if wf, ok := writers[path]; !ok {
+			newWtr, err := initFile(path)
+			if err != nil {
+				return err
+			}
+
+			writers[path] = newWtr
+			wtr = newWtr
+		} else {
+			wtr = wf
+		}
+		line := fmt.Sprintf("%v,%v\n", v.time.String(), v.kind.string())
+		_, err := wtr.w.WriteString(line)
+		if err != nil {
+			return fmt.Errorf("[save] failed to write to buffer: %w", err)
+		}
 	}
 
-	f, err := os.Create(fileName)
-	if err != nil {
-		return "", fmt.Errorf("[save] failed to create file: %w", err)
+	// 履歴を空にする
+	h.clear()
+
+	for _, w := range writers {
+		defer w.f.Close()
+		err := w.w.Flush()
+		if err != nil {
+			return fmt.Errorf("[save] failed to flush buffer: %w", err)
+		}
 	}
-	defer f.Close()
+
+	return nil
+}
+
+func initFile(path string) (*writerWithFile, error) {
+	oldText, err := readOldText(path)
+	if err != nil {
+		return nil, fmt.Errorf("[save] failed to read existing text: %w ", err)
+	}
+
+	err = os.MkdirAll(filepath.Dir(path), 0755)
+	if err != nil {
+		return nil, err
+	}
+	f, err := os.Create(path)
+	if err != nil {
+		return nil, fmt.Errorf("[save] failed to create file: %w", err)
+	}
 	w := bufio.NewWriter(f)
 
 	_, err = w.Write(oldText)
 	if err != nil {
-		return "", fmt.Errorf("[save] failed to write to buffer: %w", err)
+		return nil, fmt.Errorf("[save] failed to write to buffer: %w", err)
 	}
-
-	for _, v := range h.entries {
-		line := fmt.Sprintf("%v,%v\n", v.time.String(), v.kind.String())
-		_, err := w.WriteString(line)
-		if err != nil {
-			return "", fmt.Errorf("[save] failed to write to buffer: %w", err)
-		}
-	}
-
-	h.clear()
-
-	err = w.Flush()
-	if err != nil {
-		return "", fmt.Errorf("[save] failed to flush buffer: %w", err)
-	}
-
-	return "Successfully saved.", nil
+	return &writerWithFile{w, f}, nil
 }
 
 func readOldText(path string) ([]byte, error) {
@@ -81,13 +111,13 @@ func readOldText(path string) ([]byte, error) {
 
 	oldText, err := io.ReadAll(f)
 	if err != nil {
-		return nil, fmt.Errorf("[readOldText] failed to read all text from %v: %w", path, err)
+		return nil, fmt.Errorf("[readOldText] %w", err)
 	}
 
 	return oldText, nil
 }
 
-func getFileName() string {
-	now := time.Now().Local()
-	return fmt.Sprintf("logs/log_%v%v%v.csv", now.Year(), now.Month(), now.Day())
+func getFilePath(time time.Time) string {
+	time = time.Local()
+	return fmt.Sprintf("logs/%s/log_%s.csv", time.Format("2006"), time.Format("060102"))
 }
