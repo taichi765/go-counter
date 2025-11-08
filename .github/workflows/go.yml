@@ -46,6 +46,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: binaries
+      - name: List artifacts
+        run: pwd&&ls
 
       - name: Upload to Github Releases
         if: github.ref_type == 'tag'
