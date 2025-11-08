@@ -43,6 +43,12 @@ func (k personKind) String() string {
 	}
 }
 
+type saveMsg bool
+
+func saveFile() tea.Msg {
+	return saveMsg(false)
+}
+
 type counterModel struct {
 	elemStudentCount int
 	hsBoyCount       int
